@@ -1,0 +1,16 @@
+{
+  "activity_id": "act_20250725_001",
+  "user_id": "user_12345",
+  "action_name": "user_login",
+  "entity_type": "authentication",
+  "entity_id": "auth_session_789",
+  "success": true,
+  "response_time_ms": 245,
+  "metadata": {
+    "ip_address": "192.168.1.100",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    "device": "desktop",
+    "login_method": "password",
+    "session_duration": 3600
+  }
+}

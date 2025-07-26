@@ -1,0 +1,76 @@
+Transform: AWS::Serverless-2016-10-31
+Parameters:
+  FirehoseDeliveryStreamName:
+    Type: String
+    Default: my-delivery-stream
+    Description: Name of the Kinesis Firehose delivery stream
+Resources:
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: FirehoseAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - firehose:PutRecord
+                  - firehose:PutRecordBatch
+                Resource: !Sub "arn:aws:firehose:${AWS::Region}:${AWS::AccountId}:deliverystream/${FirehoseDeliveryStreamName}"
+
+  LambdaFunctionFunctions3tableinput:
+    Type: AWS::Serverless::Function
+    Properties:
+      MemorySize: 128
+      Description: 'Lambda function to send activity logs to Kinesis Firehose'
+      Timeout: 60
+      RuntimeManagementConfig:
+        UpdateRuntimeOn: Auto
+      Handler: lambda_function.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      FileSystemConfigs: []
+      FunctionName: s3_table_input
+      Runtime: python3.13
+      PackageType: Zip
+      LoggingConfig:
+        LogFormat: Text
+        LogGroup: /aws/lambda/s3_table_input
+      RecursiveLoop: Terminate
+      EphemeralStorage:
+        Size: 512
+      Architectures:
+        - x86_64
+      Tracing: PassThrough
+      CodeUri: LambdaFunctionFunctions3tableinput
+      Environment:
+        Variables:
+          FIREHOSE_DELIVERY_STREAM_NAME: !Ref FirehoseDeliveryStreamName
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /activity-logs
+            Method: POST
+
+Outputs:
+  ActivityLogsApi:
+    Description: "API Gateway endpoint URL for Activity Logs function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/activity-logs"
+    Export:
+      Name: !Sub "${AWS::StackName}-ActivityLogsApiUrl"
+  
+  ActivityLogsFunction:
+    Description: "Activity Logs Lambda Function ARN"
+    Value: !GetAtt LambdaFunctionFunctions3tableinput.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-ActivityLogsFunction"
