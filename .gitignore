@@ -129,3 +129,5 @@ temp/
 .env.development.local
 .env.test.local
 .env.production.local
+.claude/settings.local.json
+LambdaFunctionFunctions3tableinput/.claude/settings.local.json
