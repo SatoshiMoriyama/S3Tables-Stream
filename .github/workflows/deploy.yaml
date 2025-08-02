@@ -31,4 +31,4 @@ jobs:
          aws-region: ap-northeast-1
          role-session-name: SamDeploy
      - run: sam build
-     - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
+     - run: sam deploy --stack-name s3tables-stream --no-confirm-changeset --no-fail-on-empty-changeset
