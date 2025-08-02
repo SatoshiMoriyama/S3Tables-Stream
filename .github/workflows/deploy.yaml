@@ -16,6 +16,7 @@ permissions:
 jobs:
  deploy:
    runs-on: ubuntu-22.04
+   environment: develop
    permissions:
      id-token: write
      contents: read
@@ -27,7 +28,7 @@ jobs:
          use-installer: true
      - uses: aws-actions/configure-aws-credentials@v4
        with:
-         role-to-assume: arn:aws:iam::853835738220:role/github-action-role
+         role-to-assume: ${{ vars.AWS_ROLE_ARN }}
          aws-region: ap-northeast-1
          role-session-name: SamDeploy
      - run: sam build
