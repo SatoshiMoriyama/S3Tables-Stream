@@ -15,7 +15,7 @@ permissions:
 jobs:
  deploy:
    runs-on: ubuntu-22.04
-   environment: develop
+   environment: ${{ vars.STAGE }}
    permissions:
      id-token: write
      contents: read
